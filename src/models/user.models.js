@@ -109,20 +109,19 @@ userSchema.methods.generateAccessToken = function() {
 
 
 userSchema.methods.generateRefreshToken = function() {
-    //generated in the same way as refresh token
+    //generated in the same way as refresh 
+    //contains a lot less info than the accesstoken
+    //only contains the id
 
     return jwt.sign(
         { //1. payload
             _id : this._id,
-            email: this.email,
-            username: this.username,
-            fullname: this.fullname,
         },
 
-        process.env.ACCESS_TOKEN_SECRET,  //2. secret key
+        process.env.REFRESH_TOKEN_SECRET,  //2. secret key
 
         {   //3. expiry of the token
-            expiresIn: process.env.ACCESS_TOKEN_EXPIRY
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRY
         }
     )
 }
