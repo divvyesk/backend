@@ -15,3 +15,5 @@ const asyncHandler = (requestHandler) => ( //requestHandler is function (req, re
         catch((err)=> next(err))
     }
 )
+
+export {asyncHandler}

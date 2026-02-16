@@ -1,9 +1,9 @@
 //whatever error we send does not have a standard structure 
 //hence this file comes in which defines how each error will be structured
-class apiError extends Error{
+class ApiError extends Error{
     //Error is a class which contains certain functions
 
-    constructor(statusCode, message= "Something went wrong", errors = [], statck = ""){
+    constructor(statusCode, message= "Something went wrong", errors = [], stack = ""){
         super(message)
 
         this.statusCode = statusCode
@@ -12,9 +12,9 @@ class apiError extends Error{
         this.success = false
         this.errors = errors
 
-        if(statck)
+        if(stack)
             {
-                this.stack = statck
+                this.stack = stack
             }else
             {
                 Error.captureStackTrace(this, this.constructor)
@@ -23,4 +23,4 @@ class apiError extends Error{
     
 }
 
-export {apiError}
+export {ApiError}
