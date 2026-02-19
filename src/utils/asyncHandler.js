@@ -9,11 +9,11 @@
 //hence we pass the entire async function as an argument in the asyncHandler function
 //and here we analyze if there is an error or not in the async function
 
-const asyncHandler = (requestHandler) => ( //requestHandler is function (req, res) => {}
-    (req, res, next) => {
+const asyncHandler = (requestHandler) => { //requestHandler is function (req, res) => {}
+    return (req, res, next) => {
         Promise.resolve(requestHandler(req, res, next)).
         catch((err)=> next(err))
     }
-)
+}
 
 export {asyncHandler}

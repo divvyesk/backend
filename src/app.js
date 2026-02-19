@@ -42,4 +42,14 @@ app.use(express.static("public"))
 //user pref(dark mode etc))
 app.use(cookieParser)
 
+
+//routes import
+import userRouter from './routes/user.routes.js'
+
+//routes declaration
+app.use("/api/v1/users", userRouter)
+//first argument is the route that is being accessed
+//second argument is the router you want to use when that route is being accessed
+
+
 export {app}
