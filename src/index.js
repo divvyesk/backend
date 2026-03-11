@@ -1,10 +1,16 @@
-require('dotenv').config()
+require('dotenv').config(
+    {
+        path: './.env'
+    }
+)
 
 const express = require("express");
 const mongoose = require("mongoose");
 const { DB_NAME } = require('./constants');
 
 const app = express();
+
+
 
 
 ( async ()=>{

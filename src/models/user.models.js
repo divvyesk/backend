@@ -64,7 +64,7 @@ userSchema.pre("save", async function(next) { //in the get request we had, req, 
     if(!this.isModified("password")) return next
 
 
-    this.password = bcrypt.hash(this.password, 10) //hash function will encrypt the password
+    this.password = await bcrypt.hash(this.password, 10) //hash function will encrypt the password
     //it will take 2 arguments: password and the no of rounds 
     
     next()
