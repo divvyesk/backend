@@ -207,7 +207,7 @@
         .json(new ApiResponse(200, {}, "User logged Out"))
     })
     
-    const refreshAccessToken = asyncHandler(async (req, res) => {
+    const refreshAccessToken = asyncHandler(async (req, res) => { 
         const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
     
         if (!incomingRefreshToken) {
@@ -296,8 +296,8 @@
         const user = await User.findByIdAndUpdate(
             req.user?._id,
             {
-                $set: {
-                    fullName,
+                $set: { //mongodb operator
+                    fullName: fullName,
                     email: email
                 }
             },
@@ -311,14 +311,12 @@
     });
     
     const updateUserAvatar = asyncHandler(async(req, res) => {
-        const avatarLocalPath = req.file?.path
+        const avatarLocalPath = req.file?.path //using multer middleware
     
         if (!avatarLocalPath) {
             throw new ApiError(400, "Avatar file is missing")
         }
-    
-        //TODO: delete old image - assignment
-    
+
         const avatar = await uploadOnCloudinary(avatarLocalPath)
     
         if (!avatar.url) {
@@ -386,11 +384,13 @@
         }
     
         const channel = await User.aggregate([
+            //so this pipeline will first match the username in the user collection
             {
                 $match: {
                     username: username?.toLowerCase()
                 }
             },
+            //and then it will lookup in the subscription collection to find the subscribers 
             {
                 $lookup: {
                     from: "subscriptions",
@@ -400,6 +400,7 @@
                 }
             },
             {
+                //and subscribedTo details 
                 $lookup: {
                     from: "subscriptions",
                     localField: "_id",
@@ -408,6 +409,7 @@
                 }
             },
             {
+                //and then it will add those details as new fields in the user document
                 $addFields: {
                     subscribersCount: {
                         $size: "$subscribers"
@@ -424,7 +426,8 @@
                     }
                 }
             },
-            {
+            { 
+                //and then it will project only the required fields to be sent in response
                 $project: {
                     fullName: 1,
                     username: 1,
@@ -438,7 +441,8 @@
                 }
             }
         ])
-    
+        //so this will return an array of channels matching the username, ideally it should be only one channel since username is unique
+
         if (!channel?.length) {
             throw new ApiError(404, "channel does not exists")
         }
@@ -453,18 +457,22 @@
     const getWatchHistory = asyncHandler(async(req, res) => {
         const user = await User.aggregate([
             {
+                //this stage will match the user id in the user collection and 
                 $match: {
+                    //here the id that you requested is a string, using the mongoose function we convert it into object id and then match it with the
                     _id: new mongoose.Types.ObjectId(req.user._id)
                 }
             },
             {
+                //then it will lookup for the videos in the video collection using the watchHistory array of user document 
                 $lookup: {
-                    from: "videos",
-                    localField: "watchHistory",
+                    from: "videos", //model file
+                    localField: "watchHistory", //field that we want to be the filter
                     foreignField: "_id",
                     as: "watchHistory",
                     pipeline: [
                         {
+                            //nested lookup to find the owner details of the video from user collection using the owner field of video document
                             $lookup: {
                                 from: "users",
                                 localField: "owner",
@@ -472,6 +480,7 @@
                                 as: "owner",
                                 pipeline: [
                                     {
+                                        //and then it will project only the required fields to be sent in response
                                         $project: {
                                             fullName: 1,
                                             username: 1,
@@ -482,6 +491,7 @@
                             }
                         },
                         {
+                            //and then it will add those video details in the watchHistory field of user document and then it will project only the required fields to be sent in response
                             $addFields:{
                                 owner:{
                                     $first: "$owner"
